@@ -19,6 +19,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,6 +67,9 @@ fun AddEditMedicineScreen(
     var imageUrl by remember { mutableStateOf<String?>(null) }
     var uploading by remember { mutableStateOf(false) }
     var uploadError by remember { mutableStateOf<String?>(null) }
+    var type by remember { mutableStateOf("") }
+    val typeOptions = listOf("Colds & Flu", "Allergies", "Diarrhea")
+    var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
@@ -121,6 +127,7 @@ fun AddEditMedicineScreen(
                 price = it.price.toString()
                 stock = it.stock.toString()
                 imageUrl = it.imageUrl
+                type = it.type
             }
         }
     }
@@ -199,6 +206,34 @@ fun AddEditMedicineScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                OutlinedTextField(
+                    value = type,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Type") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    typeOptions.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(selectionOption) },
+                            onClick = {
+                                type = selectionOption
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
@@ -214,7 +249,8 @@ fun AddEditMedicineScreen(
                                 description = description,
                                 price = parsedPrice,
                                 stock = parsedStock,
-                                imageUrl = imageUrl
+                                imageUrl = imageUrl,
+                                type = type
                             )
                         )
                     } else {
@@ -225,7 +261,8 @@ fun AddEditMedicineScreen(
                                 description = description,
                                 price = parsedPrice,
                                 stock = parsedStock,
-                                imageUrl = imageUrl
+                                imageUrl = imageUrl,
+                                type = type
                             )
                         )
                     }

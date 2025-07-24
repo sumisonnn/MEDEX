@@ -127,6 +127,11 @@ fun MedicineListScreen(
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
+                                    text = medicine.type,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                Text(
                                     text = medicine.description,
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)

@@ -33,6 +33,21 @@ import androidx.navigation.NavController
 import com.example.medex.data.Medicine
 import com.example.medex.viewmodel.MedexViewModel
 import java.util.UUID
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.rememberAsyncImagePainter
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +61,56 @@ fun AddEditMedicineScreen(
     var description by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var stock by remember { mutableStateOf("") }
+    var imageUrl by remember { mutableStateOf<String?>(null) }
+    var uploading by remember { mutableStateOf(false) }
+    var uploadError by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
+    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            uploading = true
+            uploadError = null
+            // Upload to Cloudinary
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir)
+            inputStream?.use { input ->
+                tempFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+            val client = OkHttpClient()
+            val requestBody = tempFile.asRequestBody("image/*".toMediaTypeOrNull())
+            val body = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", tempFile.name, requestBody)
+                .addFormDataPart("upload_preset", "medex_unsigned") // <-- Replaced with your preset
+                .build()
+            val request = Request.Builder()
+                .url("https://api.cloudinary.com/v1_1/dq89u0ok2/image/upload") // <-- Replaced with your cloud name
+                .post(body)
+                .build()
+            Thread {
+                try {
+                    val response = client.newCall(request).execute()
+                    val responseBody = response.body?.string()
+                    if (response.isSuccessful && responseBody != null) {
+                        val url = Regex("""secure_url":"([^"]+)""").find(responseBody)?.groupValues?.get(1)
+                            ?: Regex("""url":"([^"]+)""").find(responseBody)?.groupValues?.get(1)
+                        if (url != null) {
+                            imageUrl = url
+                        } else {
+                            uploadError = "No image URL returned"
+                        }
+                    } else {
+                        uploadError = "Upload failed"
+                    }
+                } catch (e: Exception) {
+                    uploadError = e.localizedMessage
+                } finally {
+                    uploading = false
+                }
+            }.start()
+        }
+    }
 
     LaunchedEffect(medicineId) {
         if (isEditing) {
@@ -55,6 +120,7 @@ fun AddEditMedicineScreen(
                 description = it.description
                 price = it.price.toString()
                 stock = it.stock.toString()
+                imageUrl = it.imageUrl
             }
         }
     }
@@ -96,6 +162,28 @@ fun AddEditMedicineScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
+            if (imageUrl != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(imageUrl),
+                    contentDescription = "Medicine Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            Button(
+                onClick = { imagePickerLauncher.launch("image/*") },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uploading
+            ) {
+                Text(if (uploading) "Uploading..." else "Pick Image")
+            }
+            if (uploadError != null) {
+                Text(uploadError ?: "", color = Color.Red)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = price,
                 onValueChange = { price = it },
@@ -125,7 +213,8 @@ fun AddEditMedicineScreen(
                                 name = name,
                                 description = description,
                                 price = parsedPrice,
-                                stock = parsedStock
+                                stock = parsedStock,
+                                imageUrl = imageUrl
                             )
                         )
                     } else {
@@ -135,7 +224,8 @@ fun AddEditMedicineScreen(
                                 name = name,
                                 description = description,
                                 price = parsedPrice,
-                                stock = parsedStock
+                                stock = parsedStock,
+                                imageUrl = imageUrl
                             )
                         )
                     }

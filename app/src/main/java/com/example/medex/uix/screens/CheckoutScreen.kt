@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Divider
 import androidx.compose.ui.Alignment
+import androidx.compose.material.icons.filled.Delete
 
 @Composable
 fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel) {
@@ -23,9 +24,10 @@ fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel)
     var address by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var showSuccess by remember { mutableStateOf(false) }
+    var paymentChecked by remember { mutableStateOf(false) }
+    var cartItems by remember { mutableStateOf(medexViewModel.cart.toMutableList()) }
 
-    val cart = medexViewModel.cart
-    val total = cart.sumOf { it.price }
+    val total = cartItems.sumOf { it.price }
 
     Column(
         modifier = Modifier
@@ -41,7 +43,7 @@ fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel)
             Text("Checkout", style = MaterialTheme.typography.titleLarge)
         }
         Spacer(modifier = Modifier.height(16.dp))
-        if (cart.isNotEmpty()) {
+        if (cartItems.isNotEmpty()) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(4.dp)
@@ -53,8 +55,15 @@ fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel)
                         Text("Items in your cart", style = MaterialTheme.typography.titleMedium)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    for (med in cart) {
-                        Text("- ${med.name} (${med.description}) | $${med.price}", style = MaterialTheme.typography.bodyMedium)
+                    for (med in cartItems) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                            Text("- ${med.name} (${med.description}) | $${med.price}", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                            IconButton(onClick = {
+                                cartItems = cartItems.toMutableList().also { it.remove(med) }
+                            }) {
+                                Icon(Icons.Default.Delete, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error)
+                            }
+                        }
                     }
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
                     Text("Total: $${"%.2f".format(total)}", style = MaterialTheme.typography.titleMedium)
@@ -91,11 +100,18 @@ fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel)
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Payment Method: Cash on Delivery", style = MaterialTheme.typography.bodyMedium)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = paymentChecked,
+                        onCheckedChange = { paymentChecked = it }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Payment Method: Cash on Delivery", style = MaterialTheme.typography.bodyMedium)
+                }
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = {
-                        cart.forEach { med ->
+                        cartItems.forEach { med ->
                             medexViewModel.recordSale(
                                 medicineId = med.id,
                                 quantity = 1,
@@ -105,10 +121,12 @@ fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel)
                             )
                         }
                         medexViewModel.clearCart()
+                        cartItems = mutableListOf()
                         showSuccess = true
+                        paymentChecked = false
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = name.isNotBlank() && address.isNotBlank() && phone.isNotBlank() && cart.isNotEmpty()
+                    enabled = name.isNotBlank() && address.isNotBlank() && phone.isNotBlank() && cartItems.isNotEmpty() && paymentChecked
                 ) {
                     Text("Confirm Order")
                 }

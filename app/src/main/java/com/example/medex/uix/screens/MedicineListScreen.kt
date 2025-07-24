@@ -41,6 +41,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.medex.uix.Routes // Updated import
 import com.example.medex.viewmodel.MedexViewModel
+import coil.compose.rememberAsyncImagePainter
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.height
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,6 +110,16 @@ fun MedicineListScreen(
                                 .padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+                            if (medicine.imageUrl != null) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(medicine.imageUrl),
+                                    contentDescription = "Medicine Image",
+                                    modifier = Modifier
+                                        .width(64.dp)
+                                        .height(64.dp),
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                            }
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = medicine.name,

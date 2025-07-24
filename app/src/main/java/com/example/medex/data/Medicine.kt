@@ -5,5 +5,6 @@ data class Medicine(
     var name: String = "",
     var description: String = "",
     var price: Double = 0.0,
-    var stock: Int = 0
+    var stock: Int = 0,
+    var imageUrl: String? = null
 )

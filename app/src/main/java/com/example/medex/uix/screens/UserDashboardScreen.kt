@@ -16,6 +16,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.medex.viewmodel.MedexViewModel
 import com.example.medex.data.Medicine
+import coil.compose.rememberAsyncImagePainter
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,21 +74,35 @@ fun UserDashboardScreen(
                             .padding(vertical = 4.dp),
                         elevation = CardDefaults.cardElevation(2.dp)
                     ) {
-                        Row(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(medicine.name, style = MaterialTheme.typography.titleMedium)
-                                Text(medicine.description, style = MaterialTheme.typography.bodySmall)
+                            if (medicine.imageUrl != null) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(medicine.imageUrl),
+                                    contentDescription = "Medicine Image",
+                                    modifier = Modifier
+                                        .size(120.dp)
+                                        .clip(MaterialTheme.shapes.medium)
+                                        .padding(bottom = 8.dp),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                            Text(medicine.name, style = MaterialTheme.typography.titleMedium)
+                            Text(medicine.description, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(vertical = 4.dp))
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                 Text("Price: $${medicine.price}", style = MaterialTheme.typography.bodySmall)
                                 Text("Stock: ${medicine.stock}", style = MaterialTheme.typography.bodySmall)
                             }
+                            Spacer(modifier = Modifier.height(8.dp))
                             Button(
                                 onClick = { medexViewModel.addToCart(medicine) },
-                                enabled = medicine.stock > 0
+                                enabled = medicine.stock > 0,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text("Add to Cart")
                             }

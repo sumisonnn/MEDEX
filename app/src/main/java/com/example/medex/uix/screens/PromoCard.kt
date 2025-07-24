@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.layout.ContentScale
 
 @Composable
@@ -36,9 +36,9 @@ fun PromoCard(imageResId: Int) {
             Image(
                 painter = painterResource(id = imageResId),
                 contentDescription = "Promo Image",
-                modifier = Modifier.size(80.dp),
+                modifier = Modifier.fillMaxSize(),
                 alignment = Alignment.Center,
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Crop
             )
         }
     }

@@ -99,7 +99,12 @@ fun UserDashboardScreen(
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     // Promo cards
-                    val promoImages = listOf(R.drawable.medex, R.drawable.medico)
+                    val promoImages = listOf(
+                        R.drawable.med,
+                        R.drawable.med2,
+                        R.drawable.med,
+                        R.drawable.med2
+                    )
                     Row(
                         modifier = Modifier.horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)

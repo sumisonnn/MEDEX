@@ -117,6 +117,10 @@ fun SaleItem(sale: Sale, medexViewModel: MedexViewModel) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
             }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Buyer: ${sale.userName}", style = MaterialTheme.typography.bodySmall)
+            Text("Address: ${sale.userAddress}", style = MaterialTheme.typography.bodySmall)
+            Text("Phone: ${sale.userPhone}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }

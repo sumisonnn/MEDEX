@@ -17,29 +17,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.layout.width
 
 @Composable
 fun PromoCard(imageResId: Int) {
     Card(
         modifier = Modifier
             .padding(4.dp)
-            .height(90.dp)
-            .fillMaxWidth(0.7f),
+            .height(120.dp)
+            .width(180.dp),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        elevation = CardDefaults.cardElevation(2.dp)
+        // No containerColor for transparent background
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = imageResId),
-                contentDescription = "Promo Image",
-                modifier = Modifier.fillMaxSize(),
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Crop
-            )
-        }
+        Image(
+            painter = painterResource(id = imageResId),
+            contentDescription = "Promo Image",
+            modifier = Modifier.fillMaxSize(),
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Crop
+        )
     }
 }

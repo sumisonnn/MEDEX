@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddShoppingCart
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Badge
@@ -29,6 +30,11 @@ fun UserDashboardScreen(
         topBar = {
             TopAppBar(
                 title = { Text("User Dashboard") },
+                actions = {
+                    IconButton(onClick = { medexViewModel.logout(); navController.navigate(com.example.medex.uix.Routes.LOGIN) { popUpTo(com.example.medex.uix.Routes.USER_DASHBOARD) { inclusive = true } } }) {
+                        Icon(Icons.Filled.ExitToApp, contentDescription = "Logout", tint = MaterialTheme.colorScheme.onPrimary)
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary

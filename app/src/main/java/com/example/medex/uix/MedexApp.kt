@@ -85,7 +85,7 @@ fun MedexApp(medexViewModel: MedexViewModel = viewModel()) {
             )
         }
         composable(Routes.CHECKOUT) {
-            com.example.medex.uix.screens.CheckoutScreen(navController = navController)
+            com.example.medex.uix.screens.CheckoutScreen(navController = navController, medexViewModel = medexViewModel)
         }
     }
 }

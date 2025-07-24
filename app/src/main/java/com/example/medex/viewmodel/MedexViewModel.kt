@@ -17,6 +17,18 @@ class MedexViewModel : ViewModel() {
     val medicines = mutableStateListOf<Medicine>()
     val sales = mutableStateListOf<Sale>()
 
+    // Cart state
+    val cart = mutableStateListOf<Medicine>()
+    fun addToCart(medicine: Medicine) {
+        cart.add(medicine)
+    }
+    fun removeFromCart(medicine: Medicine) {
+        cart.remove(medicine)
+    }
+    fun clearCart() {
+        cart.clear()
+    }
+
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseDatabase = FirebaseDatabase.getInstance()

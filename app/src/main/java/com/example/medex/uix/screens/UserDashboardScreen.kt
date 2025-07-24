@@ -20,8 +20,8 @@ fun UserDashboardScreen(
     navController: NavController,
     medexViewModel: MedexViewModel
 ) {
-    var cart by remember { mutableStateOf(mutableListOf<Medicine>()) }
-    var showCheckoutDialog by remember { mutableStateOf(false) }
+    val cart = medexViewModel.cart // Observe cart state for recomposition
+    // var showCheckoutDialog by remember { mutableStateOf(false) } // Remove this
 
     Scaffold(
         topBar = {
@@ -70,7 +70,7 @@ fun UserDashboardScreen(
                                 Text("Stock: ${medicine.stock}", style = MaterialTheme.typography.bodySmall)
                             }
                             Button(
-                                onClick = { cart.add(medicine) },
+                                onClick = { medexViewModel.addToCart(medicine) },
                                 enabled = medicine.stock > 0
                             ) {
                                 Text("Add to Cart")

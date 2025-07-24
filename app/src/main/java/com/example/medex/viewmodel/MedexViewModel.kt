@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.google.firebase.database.*
 
 class MedexViewModel : ViewModel() {
 
@@ -18,33 +19,53 @@ class MedexViewModel : ViewModel() {
 
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val db: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val medicinesRef: DatabaseReference = db.getReference("medicines")
+    private val salesRef: DatabaseReference = db.getReference("sales")
+
     var currentUsername by mutableStateOf<String?>(null)
         private set
     var authError by mutableStateOf<String?>(null)
     var isLoading by mutableStateOf(false)
+    var userRole by mutableStateOf<String?>(null)
 
     init {
-        // Add some sample data for demonstration
-        addMedicine(Medicine(UUID.randomUUID().toString(), "Paracetamol", "Pain reliever", 2.50, 100))
-        addMedicine(Medicine(UUID.randomUUID().toString(), "Amoxicillin", "Antibiotic", 15.00, 50))
-        addMedicine(Medicine(UUID.randomUUID().toString(), "Ibuprofen", "Anti-inflammatory", 5.00, 75))
+        // Listen for medicines changes
+        medicinesRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                medicines.clear()
+                for (medSnap in snapshot.children) {
+                    val med = medSnap.getValue(Medicine::class.java)
+                    if (med != null) medicines.add(med)
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+        // Listen for sales changes
+        salesRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                sales.clear()
+                for (saleSnap in snapshot.children) {
+                    val sale = saleSnap.getValue(Sale::class.java)
+                    if (sale != null) sales.add(sale)
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
         // Set current user if already logged in
         currentUsername = auth.currentUser?.email
     }
 
     fun addMedicine(medicine: Medicine) {
-        medicines.add(medicine)
+        medicinesRef.child(medicine.id).setValue(medicine)
     }
 
     fun updateMedicine(updatedMedicine: Medicine) {
-        val index = medicines.indexOfFirst { it.id == updatedMedicine.id }
-        if (index != -1) {
-            medicines[index] = updatedMedicine
-        }
+        medicinesRef.child(updatedMedicine.id).setValue(updatedMedicine)
     }
 
     fun deleteMedicine(medicineId: String) {
-        medicines.removeIf { it.id == medicineId }
+        medicinesRef.child(medicineId).removeValue()
     }
 
     fun getMedicineById(medicineId: String?): Medicine? {
@@ -57,7 +78,7 @@ class MedexViewModel : ViewModel() {
             val newStock = medicine.stock - quantity
             updateMedicine(medicine.copy(stock = newStock))
             val sale = Sale(UUID.randomUUID().toString(), medicineId, quantity, System.currentTimeMillis())
-            sales.add(sale)
+            salesRef.child(sale.id).setValue(sale)
         } else {
             // Handle insufficient stock or medicine not found
             println("Error: Cannot record sale. Insufficient stock or medicine not found.")
@@ -77,7 +98,20 @@ class MedexViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     currentUsername = auth.currentUser?.email
                     authError = null
-                    onResult(true)
+                    // Fetch user role from database
+                    val uid = auth.currentUser?.uid
+                    if (uid != null) {
+                        db.getReference("users").child(uid).child("role").get().addOnSuccessListener { snap ->
+                            userRole = snap.getValue(String::class.java)
+                            onResult(true)
+                        }.addOnFailureListener {
+                            userRole = null
+                            onResult(true)
+                        }
+                    } else {
+                        userRole = null
+                        onResult(true)
+                    }
                 } else {
                     authError = task.exception?.localizedMessage ?: "Login failed."
                     onResult(false)
@@ -93,6 +127,12 @@ class MedexViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     currentUsername = auth.currentUser?.email
                     authError = null
+                    // Store user role in database (default to 'user')
+                    val uid = auth.currentUser?.uid
+                    if (uid != null) {
+                        db.getReference("users").child(uid).child("role").setValue("user")
+                        userRole = "user"
+                    }
                     onResult(true)
                 } else {
                     authError = task.exception?.localizedMessage ?: "Signup failed."

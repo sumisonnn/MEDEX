@@ -108,8 +108,14 @@ fun LoginScreen(
                 loginError = false
                 medexViewModel.login(username, password) { success ->
                     if (success) {
-                        navController.navigate(Routes.DASHBOARD) {
-                            popUpTo(Routes.LOGIN) { inclusive = true }
+                        if (medexViewModel.userRole == "admin") {
+                            navController.navigate(Routes.DASHBOARD) {
+                                popUpTo(Routes.LOGIN) { inclusive = true }
+                            }
+                        } else {
+                            navController.navigate(Routes.USER_DASHBOARD) {
+                                popUpTo(Routes.LOGIN) { inclusive = true }
+                            }
                         }
                     } else {
                         loginError = true

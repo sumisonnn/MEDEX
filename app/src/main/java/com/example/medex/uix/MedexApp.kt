@@ -13,6 +13,7 @@ import com.example.medex.viewmodel.MedexViewModel
 import com.example.medex.uix.screens.LoginScreen
 import com.example.medex.uix.screens.SignupScreen
 import com.example.medex.uix.screens.SplashScreen
+import com.example.medex.uix.screens.UserDashboardScreen
 
 
 object Routes {
@@ -24,6 +25,8 @@ object Routes {
     const val ADD_EDIT_MEDICINE = "add_edit_medicine/{medicineId}" // Accepts medicineId as argument
     const val ADD_EDIT_MEDICINE_NEW = "add_edit_medicine/new" // For adding new medicine
     const val SALES_LIST = "sales_list"
+    const val USER_DASHBOARD = "user_dashboard"
+    const val CHECKOUT = "checkout"
 
     fun addEditMedicine(medicineId: String?): String {
         return if (medicineId == null) ADD_EDIT_MEDICINE_NEW else "add_edit_medicine/$medicineId"
@@ -62,11 +65,27 @@ fun MedexApp(medexViewModel: MedexViewModel = viewModel()) {
                 medicineId = medicineId
             )
         }
+        composable(Routes.ADD_EDIT_MEDICINE_NEW) {
+            AddEditMedicineScreen(
+                navController = navController,
+                medexViewModel = medexViewModel,
+                medicineId = null
+            )
+        }
         composable(Routes.SALES_LIST) {
             SalesScreen(
                 navController = navController,
                 medexViewModel = medexViewModel
             )
+        }
+        composable(Routes.USER_DASHBOARD) {
+            UserDashboardScreen(
+                navController = navController,
+                medexViewModel = medexViewModel
+            )
+        }
+        composable(Routes.CHECKOUT) {
+            com.example.medex.uix.screens.CheckoutScreen(navController = navController)
         }
     }
 }

@@ -6,6 +6,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.LocalPharmacy
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Badge
@@ -20,7 +33,14 @@ import coil.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,33 +48,17 @@ fun UserDashboardScreen(
     navController: NavController,
     medexViewModel: MedexViewModel
 ) {
-    val cart = medexViewModel.cart // Observe cart state for recomposition
-    // var showCheckoutDialog by remember { mutableStateOf(false) } // Remove this
-
+    var searchText by remember { mutableStateOf("") }
+    val categories = listOf("Colds & Flu", "Allergies", "Diarrhea")
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+    var showDetail by remember { mutableStateOf<Medicine?>(null) }
+    val promos = listOf("Rapid COVID-19 Antigen Self-Test", "Shop Now")
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("User Dashboard") },
-                actions = {
-                    IconButton(onClick = { medexViewModel.logout(); navController.navigate(com.example.medex.uix.Routes.LOGIN) { popUpTo(com.example.medex.uix.Routes.USER_DASHBOARD) { inclusive = true } } }) {
-                        Icon(Icons.Filled.ExitToApp, contentDescription = "Logout", tint = MaterialTheme.colorScheme.onPrimary)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
-        },
-        floatingActionButton = {
-            if (cart.isNotEmpty()) {
-                BadgedBox(
-                    badge = { Badge { Text(cart.size.toString()) } }
-                ) {
-                    FloatingActionButton(onClick = { navController.navigate("checkout") }) {
-                        Icon(Icons.Filled.AddShoppingCart, contentDescription = "Checkout")
-                    }
-                }
+        bottomBar = {
+            NavigationBar {
+                NavigationBarItem(selected = true, onClick = {}, icon = { Icon(Icons.Filled.LocationOn, contentDescription = "Home") }, label = { Text("Home") })
+                NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Filled.ShoppingCart, contentDescription = "Cart") }, label = { Text("Cart") })
+                NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") }, label = { Text("Profile") })
             }
         }
     ) { paddingValues ->
@@ -62,54 +66,93 @@ fun UserDashboardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(12.dp)
         ) {
-            Text("Available Medicines", style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn {
-                items(medexViewModel.medicines) { medicine ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        elevation = CardDefaults.cardElevation(2.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            if (medicine.imageUrl != null) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(medicine.imageUrl),
-                                    contentDescription = "Medicine Image",
-                                    modifier = Modifier
-                                        .height(200.dp)
-                                        .fillMaxWidth()
-                                        .padding(bottom = 8.dp)
-                                        .clip(MaterialTheme.shapes.medium),
-                                    contentScale = ContentScale.Crop
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
-                            Text(medicine.name, style = MaterialTheme.typography.titleMedium)
-                            Text(medicine.description, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(vertical = 4.dp))
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text("Price: $${medicine.price}", style = MaterialTheme.typography.bodySmall)
-                                Text("Stock: ${medicine.stock}", style = MaterialTheme.typography.bodySmall)
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Button(
-                                onClick = { medexViewModel.addToCart(medicine) },
-                                enabled = medicine.stock > 0,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Add to Cart")
-                            }
-                        }
+            // Top bar
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.LocationOn, contentDescription = "Location")
+                    Text("My Home", style = MaterialTheme.typography.titleMedium)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { /* TODO: Notifications */ }) {
+                        Icon(Icons.Filled.Notifications, contentDescription = "Notifications")
+                    }
+                    IconButton(onClick = { /* TODO: Cart */ }) {
+                        Icon(Icons.Filled.ShoppingCart, contentDescription = "Cart")
+                    }
+                    IconButton(onClick = { /* TODO: Profile */ }) {
+                        Icon(Icons.Filled.Person, contentDescription = "Profile")
                     }
                 }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            // Search bar
+            OutlinedTextField(
+                value = searchText,
+                onValueChange = { searchText = it },
+                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                label = { Text("Enter drug name to search") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            // Promo cards
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                promos.forEach { promo ->
+                    PromoCard(title = promo)
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            // Filter chips
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                categories.forEach { category ->
+                    AssistChip(
+                        onClick = { selectedCategory = if (selectedCategory == category) null else category },
+                        label = { Text(category) },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = if (selectedCategory == category) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                            labelColor = if (selectedCategory == category) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                        )
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            // Product grid
+            val filteredMedicines = medexViewModel.medicines.filter {
+                (searchText.isBlank() || it.name.contains(searchText, ignoreCase = true)) &&
+                        (selectedCategory == null || it.description.contains(selectedCategory!!, ignoreCase = true))
+            }
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(4.dp)
+            ) {
+                items(filteredMedicines) { medicine ->
+                    ProductCard(medicine = medicine, onClick = { showDetail = medicine })
+                }
+            }
+            // Placeholder for detail view
+            if (showDetail != null) {
+                AlertDialog(
+                    onDismissRequest = { showDetail = null },
+                    title = { Text(showDetail!!.name) },
+                    text = { Text("Product details coming soon!") },
+                    confirmButton = {
+                        Button(onClick = { showDetail = null }) { Text("Close") }
+                    }
+                )
             }
         }
     }

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Divider
 import androidx.compose.ui.Alignment
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 
 @Composable
 fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel) {
@@ -24,6 +25,7 @@ fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel)
     var address by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var showSuccess by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
     var paymentChecked by remember { mutableStateOf(false) }
     var cartItems by remember { mutableStateOf(medexViewModel.cart.toMutableList()) }
 
@@ -124,6 +126,7 @@ fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel)
                         cartItems = mutableListOf()
                         showSuccess = true
                         paymentChecked = false
+                        showSuccessDialog = true
                     },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = name.isNotBlank() && address.isNotBlank() && phone.isNotBlank() && cartItems.isNotEmpty() && paymentChecked
@@ -148,6 +151,18 @@ fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel)
                     Text("Order placed successfully!", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleMedium)
                 }
             }
+        }
+        if (showSuccessDialog) {
+            AlertDialog(
+                onDismissRequest = { showSuccessDialog = false; navController.popBackStack(com.example.medex.uix.Routes.USER_DASHBOARD, false) },
+                title = { Text("Order Confirmed!") },
+                text = { Text("Your order has been placed successfully.") },
+                confirmButton = {
+                    Button(onClick = { showSuccessDialog = false; navController.popBackStack(com.example.medex.uix.Routes.USER_DASHBOARD, false) }) {
+                        Text("OK")
+                    }
+                }
+            )
         }
     }
 }

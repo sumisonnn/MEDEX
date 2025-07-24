@@ -35,6 +35,11 @@ import com.example.medex.viewmodel.MedexViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import coil.compose.rememberAsyncImagePainter
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Arrangement
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,13 +102,32 @@ fun SaleItem(sale: Sale, medexViewModel: MedexViewModel) {
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            if (medicine?.imageUrl != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(medicine.imageUrl),
+                    contentDescription = "Medicine Image",
+                    modifier = Modifier
+                        .height(120.dp)
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
             Text(
                 text = medicine?.name ?: "Unknown Medicine",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            if (medicine != null) {
+                Text(medicine.description, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(vertical = 2.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Price: $${medicine.price}", style = MaterialTheme.typography.bodySmall)
+                    Text("Stock: ${medicine.stock}", style = MaterialTheme.typography.bodySmall)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+            }
             Row {
                 Text(
                     text = "Quantity: ${sale.quantity}",

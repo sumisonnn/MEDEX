@@ -85,9 +85,10 @@ fun UserDashboardScreen(
                                     painter = rememberAsyncImagePainter(medicine.imageUrl),
                                     contentDescription = "Medicine Image",
                                     modifier = Modifier
-                                        .size(120.dp)
-                                        .clip(MaterialTheme.shapes.medium)
-                                        .padding(bottom = 8.dp),
+                                        .height(200.dp)
+                                        .fillMaxWidth()
+                                        .padding(bottom = 8.dp)
+                                        .clip(MaterialTheme.shapes.medium),
                                     contentScale = ContentScale.Crop
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))

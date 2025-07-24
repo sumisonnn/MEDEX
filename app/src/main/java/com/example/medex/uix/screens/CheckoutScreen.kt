@@ -25,6 +25,14 @@ fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel)
     ) {
         Text("Checkout", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))
+        if (cart.isNotEmpty()) {
+            Text("Items in your cart:", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            for (med in cart) {
+                Text("- ${med.name} (${med.description}) | $${med.price}", style = MaterialTheme.typography.bodyMedium)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },

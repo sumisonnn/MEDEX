@@ -151,7 +151,13 @@ fun AddEditMedicineScreen(
                     onClick = {
                         val currentMedicine = medexViewModel.getMedicineById(medicineId)
                         if (currentMedicine != null) {
-                            medexViewModel.recordSale(currentMedicine.id, 1) // Record sale of 1 unit
+                            medexViewModel.recordSale(
+                                currentMedicine.id,
+                                1,
+                                userName = "",
+                                userAddress = "",
+                                userPhone = ""
+                            ) // Record sale of 1 unit
                         }
                     },
                     modifier = Modifier.fillMaxWidth()

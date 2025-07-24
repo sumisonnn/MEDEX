@@ -84,12 +84,26 @@ class MedexViewModel : ViewModel() {
         return medicines.find { it.id == medicineId }
     }
 
-    fun recordSale(medicineId: String, quantity: Int) {
+    fun recordSale(
+        medicineId: String,
+        quantity: Int,
+        userName: String,
+        userAddress: String,
+        userPhone: String
+    ) {
         val medicine = getMedicineById(medicineId)
         if (medicine != null && medicine.stock >= quantity) {
             val newStock = medicine.stock - quantity
             updateMedicine(medicine.copy(stock = newStock))
-            val sale = Sale(UUID.randomUUID().toString(), medicineId, quantity, System.currentTimeMillis())
+            val sale = Sale(
+                id = java.util.UUID.randomUUID().toString(),
+                medicineId = medicineId,
+                quantity = quantity,
+                saleDate = System.currentTimeMillis(),
+                userName = userName,
+                userAddress = userAddress,
+                userPhone = userPhone
+            )
             salesRef.child(sale.id).setValue(sale)
         } else {
             // Handle insufficient stock or medicine not found

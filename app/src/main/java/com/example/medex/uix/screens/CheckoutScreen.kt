@@ -59,7 +59,13 @@ fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel)
         Button(
             onClick = {
                 cart.forEach { med ->
-                    medexViewModel.recordSale(med.id, 1)
+                    medexViewModel.recordSale(
+                        medicineId = med.id,
+                        quantity = 1,
+                        userName = name,
+                        userAddress = address,
+                        userPhone = phone
+                    )
                 }
                 medexViewModel.clearCart()
                 showSuccess = true

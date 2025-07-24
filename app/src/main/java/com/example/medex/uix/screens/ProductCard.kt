@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -19,12 +20,11 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.medex.data.Medicine
 
 @Composable
-fun ProductCard(medicine: Medicine, onClick: () -> Unit) {
+fun ProductCard(medicine: Medicine, onAddToCart: () -> Unit) {
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .fillMaxWidth()
-            .clickable { onClick() },
+            .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -47,6 +47,13 @@ fun ProductCard(medicine: Medicine, onClick: () -> Unit) {
             Text(medicine.name, style = MaterialTheme.typography.titleMedium)
             Text("$${medicine.price}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
             Text(medicine.description, style = MaterialTheme.typography.bodySmall, maxLines = 1, color = Color.Gray)
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = onAddToCart,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Add to Cart")
+            }
         }
     }
 }

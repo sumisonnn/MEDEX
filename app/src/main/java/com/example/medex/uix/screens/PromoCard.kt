@@ -13,9 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
-fun PromoCard(title: String) {
+fun PromoCard(imageResId: Int) {
     Card(
         modifier = Modifier
             .padding(4.dp)
@@ -26,10 +30,16 @@ fun PromoCard(title: String) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
     ) {
         Box(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            contentAlignment = Alignment.CenterStart
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
+            Image(
+                painter = painterResource(id = imageResId),
+                contentDescription = "Promo Image",
+                modifier = Modifier.size(80.dp),
+                alignment = Alignment.Center,
+                contentScale = ContentScale.Fit
+            )
         }
     }
 }

@@ -41,6 +41,9 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.ui.draw.clip
+import com.example.medex.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,12 +56,13 @@ fun UserDashboardScreen(
     var selectedCategory by remember { mutableStateOf<String?>(null) }
     var showDetail by remember { mutableStateOf<Medicine?>(null) }
     val promos = listOf("Rapid COVID-19 Antigen Self-Test", "Shop Now")
+    var selectedTab by remember { mutableStateOf(0) } // 0: Home, 1: Cart, 2: Profile
     Scaffold(
         bottomBar = {
             NavigationBar {
-                NavigationBarItem(selected = true, onClick = {}, icon = { Icon(Icons.Filled.LocationOn, contentDescription = "Home") }, label = { Text("Home") })
-                NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Filled.ShoppingCart, contentDescription = "Cart") }, label = { Text("Cart") })
-                NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") }, label = { Text("Profile") })
+                NavigationBarItem(selected = selectedTab == 0, onClick = { selectedTab = 0 }, icon = { Icon(Icons.Filled.LocationOn, contentDescription = "Home") }, label = { Text("Home") })
+                NavigationBarItem(selected = selectedTab == 1, onClick = { selectedTab = 1 }, icon = { Icon(Icons.Filled.ShoppingCart, contentDescription = "Cart") }, label = { Text("Cart") })
+                NavigationBarItem(selected = selectedTab == 2, onClick = { selectedTab = 2 }, icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") }, label = { Text("Profile") })
             }
         }
     ) { paddingValues ->
@@ -68,91 +72,143 @@ fun UserDashboardScreen(
                 .padding(paddingValues)
                 .padding(12.dp)
         ) {
-            // Top bar
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.LocationOn, contentDescription = "Location")
-                    Text("My Home", style = MaterialTheme.typography.titleMedium)
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { /* TODO: Notifications */ }) {
-                        Icon(Icons.Filled.Notifications, contentDescription = "Notifications")
+            when (selectedTab) {
+                0 -> { // Home/Medicine tab
+                    // Top bar
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.LocationOn, contentDescription = "Location")
+                            Text("My Home", style = MaterialTheme.typography.titleMedium)
+                        }
+                        IconButton(onClick = { medexViewModel.logout(); navController.navigate(com.example.medex.uix.Routes.LOGIN) { popUpTo(com.example.medex.uix.Routes.USER_DASHBOARD) { inclusive = true } } }) {
+                            Icon(Icons.Filled.ExitToApp, contentDescription = "Logout")
+                        }
                     }
-                    IconButton(onClick = { /* TODO: Cart */ }) {
-                        Icon(Icons.Filled.ShoppingCart, contentDescription = "Cart")
-                    }
-                    IconButton(onClick = { /* TODO: Profile */ }) {
-                        Icon(Icons.Filled.Person, contentDescription = "Profile")
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            // Search bar
-            OutlinedTextField(
-                value = searchText,
-                onValueChange = { searchText = it },
-                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-                label = { Text("Enter drug name to search") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            // Promo cards
-            Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                promos.forEach { promo ->
-                    PromoCard(title = promo)
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            // Filter chips
-            Row(
-                modifier = Modifier
-                    .horizontalScroll(rememberScrollState())
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                categories.forEach { category ->
-                    AssistChip(
-                        onClick = { selectedCategory = if (selectedCategory == category) null else category },
-                        label = { Text(category) },
-                        colors = AssistChipDefaults.assistChipColors(
-                            containerColor = if (selectedCategory == category) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                            labelColor = if (selectedCategory == category) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                        )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    // Search bar
+                    OutlinedTextField(
+                        value = searchText,
+                        onValueChange = { searchText = it },
+                        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                        label = { Text("Enter drug name to search") },
+                        modifier = Modifier.fillMaxWidth()
                     )
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            // Product grid
-            val filteredMedicines = medexViewModel.medicines.filter {
-                (searchText.isBlank() || it.name.contains(searchText, ignoreCase = true)) &&
-                        (selectedCategory == null || it.description.contains(selectedCategory!!, ignoreCase = true))
-            }
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(4.dp)
-            ) {
-                items(filteredMedicines) { medicine ->
-                    ProductCard(medicine = medicine, onClick = { showDetail = medicine })
-                }
-            }
-            // Placeholder for detail view
-            if (showDetail != null) {
-                AlertDialog(
-                    onDismissRequest = { showDetail = null },
-                    title = { Text(showDetail!!.name) },
-                    text = { Text("Product details coming soon!") },
-                    confirmButton = {
-                        Button(onClick = { showDetail = null }) { Text("Close") }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    // Promo cards
+                    val promoImages = listOf(R.drawable.medex, R.drawable.medico)
+                    Row(
+                        modifier = Modifier.horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        promoImages.forEach { imageResId ->
+                            PromoCard(imageResId = imageResId)
+                        }
                     }
-                )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    // Filter chips
+                    Row(
+                        modifier = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        categories.forEach { category ->
+                            AssistChip(
+                                onClick = { selectedCategory = if (selectedCategory == category) null else category },
+                                label = { Text(category) },
+                                colors = AssistChipDefaults.assistChipColors(
+                                    containerColor = if (selectedCategory == category) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                                    labelColor = if (selectedCategory == category) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                )
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    // Product grid
+                    val filteredMedicines = medexViewModel.medicines.filter {
+                        (searchText.isBlank() || it.name.contains(searchText, ignoreCase = true)) &&
+                                (selectedCategory == null || it.description.contains(selectedCategory!!, ignoreCase = true))
+                    }
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(4.dp)
+                    ) {
+                        items(filteredMedicines) { medicine ->
+                            ProductCard(medicine = medicine, onAddToCart = {
+                                medexViewModel.addToCart(medicine)
+                            })
+                        }
+                    }
+                    // Placeholder for detail view
+                    if (showDetail != null) {
+                        AlertDialog(
+                            onDismissRequest = { showDetail = null },
+                            title = { Text(showDetail!!.name) },
+                            text = { Text("Product details coming soon!") },
+                            confirmButton = {
+                                Button(onClick = { showDetail = null }) { Text("Close") }
+                            }
+                        )
+                    }
+                }
+                1 -> { // Cart tab
+                    Text("My Cart", style = MaterialTheme.typography.titleLarge)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    if (medexViewModel.cart.isEmpty()) {
+                        Text("Your cart is empty.", style = MaterialTheme.typography.bodyLarge)
+                    } else {
+                        LazyColumn {
+                            items(medexViewModel.cart) { medicine ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp),
+                                    elevation = CardDefaults.cardElevation(2.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        if (medicine.imageUrl != null) {
+                                            Image(
+                                                painter = rememberAsyncImagePainter(medicine.imageUrl),
+                                                contentDescription = "Medicine Image",
+                                                modifier = Modifier
+                                                    .size(60.dp)
+                                                    .clip(MaterialTheme.shapes.medium),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(medicine.name, style = MaterialTheme.typography.titleMedium)
+                                            Text("$${medicine.price}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                                        }
+                                        IconButton(onClick = { medexViewModel.removeFromCart(medicine) }) {
+                                            Icon(Icons.Filled.Delete, contentDescription = "Remove from cart")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(
+                            onClick = { navController.navigate(com.example.medex.uix.Routes.CHECKOUT) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Checkout")
+                        }
+                    }
+                }
+                2 -> { // Profile tab
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Text("Profile tab coming soon!", style = MaterialTheme.typography.titleLarge)
+                }
             }
         }
     }

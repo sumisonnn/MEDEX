@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.medex.uix.Routes
 import com.example.medex.viewmodel.MedexViewModel
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun SignupScreen(
@@ -40,6 +41,8 @@ fun SignupScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var signupError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    val isLoading = medexViewModel.isLoading
+    val authError = medexViewModel.authError
 
     Column(
         modifier = Modifier
@@ -57,8 +60,8 @@ fun SignupScreen(
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Username") },
-            isError = signupError,
+            label = { Text("Email") },
+            isError = signupError || authError != null,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -89,29 +92,43 @@ fun SignupScreen(
                 modifier = Modifier.padding(top = 4.dp)
             )
         }
+        if (authError != null) {
+            Text(
+                text = authError,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
+                signupError = false
+                errorMessage = ""
                 if (password != confirmPassword) {
                     signupError = true
                     errorMessage = "Passwords do not match."
                 } else if (username.isBlank() || password.isBlank()) {
                     signupError = true
-                    errorMessage = "Username and password cannot be empty."
-                } else if (medexViewModel.signup(username, password)) {
-                    navController.navigate(Routes.DASHBOARD) {
-                        // Pop all destinations up to signup and then include signup, so back button from dashboard works
-                        popUpTo(Routes.SIGNUP) { inclusive = true }
-                    }
+                    errorMessage = "Email and password cannot be empty."
                 } else {
-                    signupError = true
-                    errorMessage = "Username already exists."
+                    medexViewModel.signup(username, password) { success ->
+                        if (success) {
+                            navController.navigate(Routes.LOGIN) {
+                                popUpTo(Routes.SIGNUP) { inclusive = true }
+                            }
+                        } else {
+                            signupError = true
+                            errorMessage = authError ?: "Signup failed."
+                        }
+                    }
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         ) {
-            Text("Sign Up")
+            Text(if (isLoading) "Signing up..." else "Sign Up")
         }
         Spacer(modifier = Modifier.height(8.dp))
         TextButton(onClick = { navController.popBackStack() }) { // Go back to login

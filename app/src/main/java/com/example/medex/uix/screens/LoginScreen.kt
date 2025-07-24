@@ -33,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medex.R
 import com.example.medex.uix.Routes
 import com.example.medex.viewmodel.MedexViewModel
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun LoginScreen(
@@ -42,6 +43,8 @@ fun LoginScreen(
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var loginError by remember { mutableStateOf(false) }
+    val isLoading = medexViewModel.isLoading
+    val authError = medexViewModel.authError
 
     Column(
         modifier = Modifier
@@ -68,8 +71,8 @@ fun LoginScreen(
         OutlinedTextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Username") },
-            isError = loginError,
+            label = { Text("Email") },
+            isError = loginError || authError != null,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -79,12 +82,20 @@ fun LoginScreen(
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            isError = loginError,
+            isError = loginError || authError != null,
             modifier = Modifier.fillMaxWidth()
         )
         if (loginError) {
             Text(
-                text = "Invalid username or password",
+                text = "Invalid email or password",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+        if (authError != null) {
+            Text(
+                text = authError,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(top = 4.dp)
@@ -94,18 +105,21 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                if (medexViewModel.login(username, password)) {
-                    navController.navigate(Routes.DASHBOARD) {
-
-                        popUpTo(Routes.LOGIN) { inclusive = true }
+                loginError = false
+                medexViewModel.login(username, password) { success ->
+                    if (success) {
+                        navController.navigate(Routes.DASHBOARD) {
+                            popUpTo(Routes.LOGIN) { inclusive = true }
+                        }
+                    } else {
+                        loginError = true
                     }
-                } else {
-                    loginError = true
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         ) {
-            Text("Login")
+            Text(if (isLoading) "Logging in..." else "Login")
         }
         Spacer(modifier = Modifier.height(8.dp))
         TextButton(onClick = { navController.navigate(Routes.SIGNUP) }) {

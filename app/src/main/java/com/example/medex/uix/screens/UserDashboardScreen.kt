@@ -57,7 +57,7 @@ fun UserDashboardScreen(
     medexViewModel: MedexViewModel
 ) {
     var searchText by remember { mutableStateOf("") }
-    val categories = listOf("Colds & Flu", "Allergies", "Diarrhea")
+    val categories = listOf("Colds & Flu", "Ayurvedic", "General")
     var selectedCategory by remember { mutableStateOf<String?>(null) }
     var showDetail by remember { mutableStateOf<Medicine?>(null) }
     val promos = listOf("Rapid COVID-19 Antigen Self-Test", "Shop Now")

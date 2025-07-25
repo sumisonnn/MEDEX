@@ -19,6 +19,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,6 +54,7 @@ import java.io.File
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.rememberCoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,6 +71,8 @@ fun AddEditMedicineScreen(
     var imageUrl by remember { mutableStateOf<String?>(null) }
     var uploading by remember { mutableStateOf(false) }
     var uploadError by remember { mutableStateOf<String?>(null) }
+    var category by remember { mutableStateOf("") }
+    val categoryOptions = listOf("Colds & Flu", "Ayurvedic", "General")
     val context = LocalContext.current
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
@@ -123,6 +130,7 @@ fun AddEditMedicineScreen(
                 price = it.price.toString()
                 stock = it.stock.toString()
                 imageUrl = it.imageUrl
+                category = it.category
             }
         }
     }
@@ -187,6 +195,39 @@ fun AddEditMedicineScreen(
                 Text(uploadError ?: "", color = Color.Red)
             }
             Spacer(modifier = Modifier.height(8.dp))
+            // Category dropdown
+            var expanded by remember { mutableStateOf(false) }
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded }
+            ) {
+                OutlinedTextField(
+                    value = category,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Type of Medicine") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    categoryOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                category = option
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = price,
                 onValueChange = { price = it },
@@ -217,7 +258,8 @@ fun AddEditMedicineScreen(
                                 description = description,
                                 price = parsedPrice,
                                 stock = parsedStock,
-                                imageUrl = imageUrl
+                                imageUrl = imageUrl,
+                                category = category
                             )
                         )
                     } else {
@@ -228,7 +270,8 @@ fun AddEditMedicineScreen(
                                 description = description,
                                 price = parsedPrice,
                                 stock = parsedStock,
-                                imageUrl = imageUrl
+                                imageUrl = imageUrl,
+                                category = category
                             )
                         )
                     }

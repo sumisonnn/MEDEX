@@ -72,7 +72,7 @@ fun SignupScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Sign Up.",
+            text = "CREATE ACCOUNT",
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 16.dp)

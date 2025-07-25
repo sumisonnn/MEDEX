@@ -48,9 +48,8 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,8 +66,6 @@ fun AddEditMedicineScreen(
     var imageUrl by remember { mutableStateOf<String?>(null) }
     var uploading by remember { mutableStateOf(false) }
     var uploadError by remember { mutableStateOf<String?>(null) }
-    var category by remember { mutableStateOf("") }
-    val categories = listOf("Colds & Flu", "Allergies", "Diarrhea")
     val context = LocalContext.current
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
@@ -126,7 +123,6 @@ fun AddEditMedicineScreen(
                 price = it.price.toString()
                 stock = it.stock.toString()
                 imageUrl = it.imageUrl
-                category = it.category
             }
         }
     }
@@ -151,6 +147,7 @@ fun AddEditMedicineScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
@@ -167,36 +164,6 @@ fun AddEditMedicineScreen(
                 label = { Text("Description") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            // Category dropdown
-            var expanded by remember { mutableStateOf(false) }
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded }
-            ) {
-                OutlinedTextField(
-                    value = category,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Category") },
-                    modifier = Modifier.menuAnchor().fillMaxWidth(),
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    categories.forEach { cat ->
-                        DropdownMenuItem(
-                            text = { Text(cat) },
-                            onClick = {
-                                category = cat
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
             Spacer(modifier = Modifier.height(8.dp))
             if (imageUrl != null) {
                 Image(
@@ -250,8 +217,7 @@ fun AddEditMedicineScreen(
                                 description = description,
                                 price = parsedPrice,
                                 stock = parsedStock,
-                                imageUrl = imageUrl,
-                                category = category
+                                imageUrl = imageUrl
                             )
                         )
                     } else {
@@ -262,8 +228,7 @@ fun AddEditMedicineScreen(
                                 description = description,
                                 price = parsedPrice,
                                 stock = parsedStock,
-                                imageUrl = imageUrl,
-                                category = category
+                                imageUrl = imageUrl
                             )
                         )
                     }

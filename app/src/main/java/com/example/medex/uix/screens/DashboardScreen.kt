@@ -75,16 +75,10 @@ fun DashboardScreen(navController: NavController, medexViewModel: MedexViewModel
                     .padding(bottom = 8.dp)
             )
             Text(
-                text = "Welcome, ${medexViewModel.currentUsername ?: "User"}" ,
+                text = "Welcome, Admin",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                text = "Pharmacy Management",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 24.dp)
             )
             Row(
                 modifier = Modifier.padding(vertical = 16.dp),

@@ -117,10 +117,10 @@ fun UserDashboardScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                         // Promo cards
                         val promoImages = listOf(
-                            R.drawable.medex,
-                            R.drawable.medico,
-                            R.drawable.splashlogo,
-                            R.drawable.ic_launcher_foreground
+                            R.drawable.ad1,
+                            R.drawable.ad2,
+                            R.drawable.ad3,
+                            R.drawable.ad4
                         )
                         Row(
                             modifier = Modifier.horizontalScroll(rememberScrollState()),

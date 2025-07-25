@@ -44,6 +44,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.ui.draw.clip
 import com.example.medex.R
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,6 +90,14 @@ fun UserDashboardScreen(
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
+                    // Welcome message
+                    val welcomeName = medexViewModel.profileName
+                    if (welcomeName.isNotBlank()) {
+                        Text("Welcome, $welcomeName!", style = MaterialTheme.typography.titleLarge)
+                    } else {
+                        Text("Welcome!", style = MaterialTheme.typography.titleLarge)
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                     // Search bar
                     OutlinedTextField(
                         value = searchText,
@@ -100,10 +109,10 @@ fun UserDashboardScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     // Promo cards
                     val promoImages = listOf(
-                        R.drawable.med,
-                        R.drawable.med2,
-                        R.drawable.med,
-                        R.drawable.med2
+                        R.drawable.medex,
+                        R.drawable.medico,
+                        R.drawable.splashlogo,
+                        R.drawable.ic_launcher_foreground
                     )
                     Row(
                         modifier = Modifier.horizontalScroll(rememberScrollState()),
@@ -211,8 +220,65 @@ fun UserDashboardScreen(
                     }
                 }
                 2 -> { // Profile tab
-                    Spacer(modifier = Modifier.height(32.dp))
-                    Text("Profile tab coming soon!", style = MaterialTheme.typography.titleLarge)
+                    val context = LocalContext.current
+                    val vm = medexViewModel
+                    var name by remember { mutableStateOf(vm.profileName) }
+                    var email by remember { mutableStateOf(vm.profileEmail) }
+                    var phone by remember { mutableStateOf(vm.profilePhone) }
+                    var showSaved by remember { mutableStateOf(false) }
+                    var isLoading by remember { mutableStateOf(false) }
+                    var error by remember { mutableStateOf<String?>(null) }
+
+                    // Load profile when tab is selected
+                    LaunchedEffect(Unit) {
+                        vm.loadUserProfile()
+                        name = vm.profileName
+                        email = vm.profileEmail
+                        phone = vm.profilePhone
+                    }
+
+                    Text("Edit Profile", style = MaterialTheme.typography.titleLarge)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Name") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Email") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = phone,
+                        onValueChange = { phone = it },
+                        label = { Text("Phone") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = {
+                        isLoading = true
+                        error = null
+                        vm.updateUserProfile(name, email, phone) { success ->
+                            isLoading = false
+                            showSaved = success
+                            if (!success) error = "Failed to save profile."
+                        }
+                    }, modifier = Modifier.fillMaxWidth(), enabled = !isLoading) {
+                        if (isLoading) CircularProgressIndicator(modifier = Modifier.size(20.dp)) else Text("Save")
+                    }
+                    if (showSaved) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Profile saved!", color = MaterialTheme.colorScheme.primary)
+                    }
+                    if (error != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(error!!, color = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         }

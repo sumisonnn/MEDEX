@@ -41,6 +41,10 @@ class MedexViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
     var userRole by mutableStateOf<String?>(null)
 
+    var profileName by mutableStateOf("")
+    var profileEmail by mutableStateOf("")
+    var profilePhone by mutableStateOf("")
+
     init {
         // Listen for medicines changes
         medicinesRef.addValueEventListener(object : ValueEventListener {
@@ -66,6 +70,7 @@ class MedexViewModel : ViewModel() {
         })
         // Set current user if already logged in
         currentUsername = auth.currentUser?.email
+        loadUserProfile()
     }
 
     fun addMedicine(medicine: Medicine) {
@@ -174,5 +179,33 @@ class MedexViewModel : ViewModel() {
 
     fun isLoggedIn(): Boolean {
         return auth.currentUser != null
+    }
+
+    fun loadUserProfile() {
+        val uid = auth.currentUser?.uid ?: return
+        db.getReference("users").child(uid).child("profile").get().addOnSuccessListener { snap ->
+            profileName = snap.child("name").getValue(String::class.java) ?: ""
+            profileEmail = snap.child("email").getValue(String::class.java) ?: ""
+            profilePhone = snap.child("phone").getValue(String::class.java) ?: ""
+        }
+    }
+
+    fun updateUserProfile(name: String, email: String, phone: String, onResult: (Boolean) -> Unit = {}) {
+        val uid = auth.currentUser?.uid ?: return
+        val profileMap = mapOf(
+            "name" to name,
+            "email" to email,
+            "phone" to phone
+        )
+        db.getReference("users").child(uid).child("profile").setValue(profileMap)
+            .addOnSuccessListener {
+                profileName = name
+                profileEmail = email
+                profilePhone = phone
+                onResult(true)
+            }
+            .addOnFailureListener {
+                onResult(false)
+            }
     }
 }

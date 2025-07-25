@@ -246,48 +246,64 @@ fun UserDashboardScreen(
                         var showSaved by remember { mutableStateOf(false) }
                         var isLoading by remember { mutableStateOf(false) }
                         var error by remember { mutableStateOf<String?>(null) }
+                        var isEditing by remember { mutableStateOf(false) }
 
                         // Load profile when tab is selected
                         LaunchedEffect(Unit) {
                             vm.loadUserProfile()
-                            name = vm.profileName
-                            email = vm.profileEmail
-                            phone = vm.profilePhone
+                            if (vm.profileName.isNotBlank()) name = vm.profileName
+                            if (vm.profileEmail.isNotBlank()) email = vm.profileEmail
+                            if (vm.profilePhone.isNotBlank()) phone = vm.profilePhone
                         }
 
-                        Text("Edit Profile", style = MaterialTheme.typography.titleLarge)
+                        Text("Profile", style = MaterialTheme.typography.titleLarge)
                         Spacer(modifier = Modifier.height(16.dp))
-                        OutlinedTextField(
-                            value = name,
-                            onValueChange = { name = it },
-                            label = { Text("Name") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = email,
-                            onValueChange = { email = it },
-                            label = { Text("Email") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = phone,
-                            onValueChange = { phone = it },
-                            label = { Text("Phone") },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = {
-                            isLoading = true
-                            error = null
-                            vm.updateUserProfile(name, email, phone) { success ->
-                                isLoading = false
-                                showSaved = success
-                                if (!success) error = "Failed to save profile."
+                        if (!isEditing) {
+                            // View mode
+                            Text("Name: ${if (name.isNotBlank()) name else "-"}", style = MaterialTheme.typography.bodyLarge)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Email: ${if (email.isNotBlank()) email else "-"}", style = MaterialTheme.typography.bodyLarge)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Phone: ${if (phone.isNotBlank()) phone else "-"}", style = MaterialTheme.typography.bodyLarge)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(onClick = { isEditing = true }, modifier = Modifier.fillMaxWidth()) {
+                                Text("Edit")
                             }
-                        }, modifier = Modifier.fillMaxWidth(), enabled = !isLoading) {
-                            if (isLoading) CircularProgressIndicator(modifier = Modifier.size(20.dp)) else Text("Save")
+                        } else {
+                            // Edit mode
+                            OutlinedTextField(
+                                value = name,
+                                onValueChange = { name = it },
+                                label = { Text("Name") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = email,
+                                onValueChange = { email = it },
+                                label = { Text("Email") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = phone,
+                                onValueChange = { phone = it },
+                                label = { Text("Phone") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(onClick = {
+                                isLoading = true
+                                error = null
+                                vm.updateUserProfile(name, email, phone) { success ->
+                                    isLoading = false
+                                    showSaved = success
+                                    if (success) isEditing = false
+                                    if (!success) error = "Failed to save profile."
+                                }
+                            }, modifier = Modifier.fillMaxWidth(), enabled = !isLoading) {
+                                if (isLoading) CircularProgressIndicator(modifier = Modifier.size(20.dp)) else Text("Save")
+                            }
                         }
                         if (showSaved) {
                             Spacer(modifier = Modifier.height(8.dp))

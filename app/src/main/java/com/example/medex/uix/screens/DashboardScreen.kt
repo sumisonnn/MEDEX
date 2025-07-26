@@ -71,7 +71,7 @@ fun DashboardScreen(navController: NavController, medexViewModel: MedexViewModel
                 painter = painterResource(id = R.drawable.medex),
                 contentDescription = "MEDEX Logo",
                 modifier = Modifier
-                    .height(120.dp)
+                    .height(200.dp)
                     .padding(bottom = 8.dp)
             )
             Text(

@@ -40,7 +40,7 @@ fun SplashScreen(navController: NavController) {
     ) {
         // Add Image at the top
         Image(
-            painter = painterResource(id = R.drawable.splashlogo),
+            painter = painterResource(id = R.drawable.splash),
             contentDescription = "MEDEX Logo",
             modifier = Modifier
                 .size(350.dp)
@@ -52,6 +52,7 @@ fun SplashScreen(navController: NavController) {
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
+
 
     }
 }

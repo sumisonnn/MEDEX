@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LocalPharmacy
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -46,11 +48,6 @@ fun DashboardScreen(navController: NavController, medexViewModel: MedexViewModel
         topBar = {
             TopAppBar(
                 title = { Text("MEDEX Dashboard") },
-                actions = {
-                    IconButton(onClick = { medexViewModel.logout(); navController.navigate(Routes.LOGIN) { popUpTo(Routes.DASHBOARD) { inclusive = true } } }) {
-                        Icon(Icons.Filled.ExitToApp, contentDescription = "Logout", tint = MaterialTheme.colorScheme.onPrimary)
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
@@ -66,12 +63,33 @@ fun DashboardScreen(navController: NavController, medexViewModel: MedexViewModel
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Header row with title and logout button (similar to user dashboard)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.LocationOn, contentDescription = "Location")
+                    Text("Admin Dashboard", style = MaterialTheme.typography.titleMedium)
+                }
+                IconButton(onClick = {
+                    medexViewModel.logout();
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.DASHBOARD) { inclusive = true }
+                    }
+                }) {
+                    Icon(Icons.Filled.ExitToApp, contentDescription = "Logout")
+                }
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
+
             Image(
                 painter = painterResource(id = R.drawable.medex),
                 contentDescription = "MEDEX Logo",
                 modifier = Modifier
-                    .height(200.dp)
+                    .height(120.dp)
                     .padding(bottom = 8.dp)
             )
             Text(

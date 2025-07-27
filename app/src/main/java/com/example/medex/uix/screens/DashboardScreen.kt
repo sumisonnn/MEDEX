@@ -45,15 +45,6 @@ import com.example.medex.viewmodel.MedexViewModel
 @Composable
 fun DashboardScreen(navController: NavController, medexViewModel: MedexViewModel = viewModel()) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("MEDEX Dashboard") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
-        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -63,16 +54,17 @@ fun DashboardScreen(navController: NavController, medexViewModel: MedexViewModel
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header row with title and logout button (similar to user dashboard)
+            // Welcome text and logout button in same row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.LocationOn, contentDescription = "Location")
-                    Text("Admin Dashboard", style = MaterialTheme.typography.titleMedium)
-                }
+                Text(
+                    text = "Welcome, Admin",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
                 IconButton(onClick = {
                     medexViewModel.logout();
                     navController.navigate(Routes.LOGIN) {
@@ -89,15 +81,10 @@ fun DashboardScreen(navController: NavController, medexViewModel: MedexViewModel
                 painter = painterResource(id = R.drawable.medex),
                 contentDescription = "MEDEX Logo",
                 modifier = Modifier
-                    .height(120.dp)
+                    .height(180.dp)
                     .padding(bottom = 8.dp)
             )
-            Text(
-                text = "Welcome, Admin",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+
             Row(
                 modifier = Modifier.padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)

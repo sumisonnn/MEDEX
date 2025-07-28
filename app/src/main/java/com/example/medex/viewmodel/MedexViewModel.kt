@@ -2,8 +2,8 @@ package com.example.medex.viewmodel
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import com.example.medex.data.Medicine
-import com.example.medex.data.Sale
+import com.example.medex.data.model.Medicine
+import com.example.medex.data.model.Sale
 import java.util.UUID
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.runtime.mutableStateOf
@@ -101,7 +101,7 @@ class MedexViewModel : ViewModel() {
             val newStock = medicine.stock - quantity
             updateMedicine(medicine.copy(stock = newStock))
             val sale = Sale(
-                id = java.util.UUID.randomUUID().toString(),
+                id = UUID.randomUUID().toString(),
                 medicineId = medicineId,
                 quantity = quantity,
                 saleDate = System.currentTimeMillis(),

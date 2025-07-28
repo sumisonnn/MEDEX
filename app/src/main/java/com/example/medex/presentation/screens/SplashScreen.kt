@@ -1,11 +1,9 @@
-package com.example.medex.uix.screens
+package com.example.medex.presentation.screens
 
 import androidx.compose.foundation.Image // New import
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer // New import
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.medex.R
-import com.example.medex.uix.Routes
+import com.example.medex.presentation.Routes
 import kotlinx.coroutines.delay
 
 @Composable

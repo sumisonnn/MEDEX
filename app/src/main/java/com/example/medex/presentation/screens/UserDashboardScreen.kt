@@ -1,16 +1,11 @@
-package com.example.medex.uix.screens
+package com.example.medex.presentation.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.LocalPharmacy
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
@@ -20,28 +15,22 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Badge
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.medex.viewmodel.MedexViewModel
-import com.example.medex.data.Medicine
+import com.example.medex.data.model.Medicine
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.res.painterResource
-import androidx.compose.foundation.clickable
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.Delete
 import com.example.medex.R
 import androidx.compose.ui.platform.LocalContext
@@ -49,6 +38,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.zIndex
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.ui.draw.clip
+import com.example.medex.presentation.components.ProductCard
+import com.example.medex.presentation.components.PromoCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,7 +84,7 @@ fun UserDashboardScreen(
                                 Icon(Icons.Filled.LocationOn, contentDescription = "Location")
                                 Text("My Home", style = MaterialTheme.typography.titleMedium)
                             }
-                            IconButton(onClick = { medexViewModel.logout(); navController.navigate(com.example.medex.uix.Routes.LOGIN) { popUpTo(com.example.medex.uix.Routes.USER_DASHBOARD) { inclusive = true } } }) {
+                            IconButton(onClick = { medexViewModel.logout(); navController.navigate(com.example.medex.presentation.Routes.LOGIN) { popUpTo(com.example.medex.presentation.Routes.USER_DASHBOARD) { inclusive = true } } }) {
                                 Icon(Icons.Filled.ExitToApp, contentDescription = "Logout")
                             }
                         }
@@ -230,7 +221,7 @@ fun UserDashboardScreen(
                             }
                             Spacer(modifier = Modifier.height(16.dp))
                             Button(
-                                onClick = { navController.navigate(com.example.medex.uix.Routes.CHECKOUT) },
+                                onClick = { navController.navigate(com.example.medex.presentation.Routes.CHECKOUT) },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text("Checkout")

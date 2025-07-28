@@ -1,4 +1,4 @@
-package com.example.medex.uix.screens
+package com.example.medex.presentation.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -154,11 +154,11 @@ fun CheckoutScreen(navController: NavController, medexViewModel: MedexViewModel)
         }
         if (showSuccessDialog) {
             AlertDialog(
-                onDismissRequest = { showSuccessDialog = false; navController.popBackStack(com.example.medex.uix.Routes.USER_DASHBOARD, false) },
+                onDismissRequest = { showSuccessDialog = false; navController.popBackStack(com.example.medex.presentation.Routes.USER_DASHBOARD, false) },
                 title = { Text("Order Confirmed!") },
                 text = { Text("Your order has been placed successfully.") },
                 confirmButton = {
-                    Button(onClick = { showSuccessDialog = false; navController.popBackStack(com.example.medex.uix.Routes.USER_DASHBOARD, false) }) {
+                    Button(onClick = { showSuccessDialog = false; navController.popBackStack(com.example.medex.presentation.Routes.USER_DASHBOARD, false) }) {
                         Text("OK")
                     }
                 }

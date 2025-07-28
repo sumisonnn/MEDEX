@@ -1,4 +1,4 @@
-package com.example.medex.uix.screens // Updated package
+package com.example.medex.presentation.screens // Updated package
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -39,7 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.medex.uix.Routes // Updated import
+import com.example.medex.presentation.Routes // Updated import
 import com.example.medex.viewmodel.MedexViewModel
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.Image

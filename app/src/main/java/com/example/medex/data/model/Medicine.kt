@@ -1,4 +1,4 @@
-package com.example.medex.data
+package com.example.medex.data.model
 
 data class Medicine(
     val id: String = "",

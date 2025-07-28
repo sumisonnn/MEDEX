@@ -1,6 +1,6 @@
 
 
-package com.example.medex.uix.screens
+package com.example.medex.presentation.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.medex.data.Sale
+import com.example.medex.data.model.Sale
 import com.example.medex.viewmodel.MedexViewModel
 import java.text.SimpleDateFormat
 import java.util.Date

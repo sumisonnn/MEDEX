@@ -1,19 +1,19 @@
-package com.example.medex.uix // Updated package
+package com.example.medex.presentation // Updated package
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.medex.uix.screens.AddEditMedicineScreen
-import com.example.medex.uix.screens.DashboardScreen
-import com.example.medex.uix.screens.MedicineListScreen
-import com.example.medex.uix.screens.SalesScreen
+import com.example.medex.presentation.screens.AddEditMedicineScreen
+import com.example.medex.presentation.screens.DashboardScreen
+import com.example.medex.presentation.screens.MedicineListScreen
+import com.example.medex.presentation.screens.SalesScreen
 import com.example.medex.viewmodel.MedexViewModel
-import com.example.medex.uix.screens.LoginScreen
-import com.example.medex.uix.screens.SignupScreen
-import com.example.medex.uix.screens.SplashScreen
-import com.example.medex.uix.screens.UserDashboardScreen
+import com.example.medex.presentation.screens.LoginScreen
+import com.example.medex.presentation.screens.SignupScreen
+import com.example.medex.presentation.screens.SplashScreen
+import com.example.medex.presentation.screens.UserDashboardScreen
 
 
 object Routes {
@@ -85,7 +85,7 @@ fun MedexApp(medexViewModel: MedexViewModel = viewModel()) {
             )
         }
         composable(Routes.CHECKOUT) {
-            com.example.medex.uix.screens.CheckoutScreen(navController = navController, medexViewModel = medexViewModel)
+            com.example.medex.presentation.screens.CheckoutScreen(navController = navController, medexViewModel = medexViewModel)
         }
     }
 }

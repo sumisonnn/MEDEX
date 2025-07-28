@@ -1,8 +1,4 @@
-
-
-package com.example.medex.data
-
-import java.util.Date
+package com.example.medex.data.model
 
 data class Sale(
     val id: String = "",

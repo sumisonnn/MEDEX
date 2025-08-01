@@ -5,15 +5,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.medex.presentation.screens.AddEditMedicineScreen
-import com.example.medex.presentation.screens.DashboardScreen
-import com.example.medex.presentation.screens.MedicineListScreen
-import com.example.medex.presentation.screens.SalesScreen
+import com.example.medex.presentation.views.AddEditMedicineScreen
+import com.example.medex.presentation.views.DashboardScreen
+import com.example.medex.presentation.views.MedicineListScreen
+import com.example.medex.presentation.views.SalesScreen
 import com.example.medex.viewmodel.MedexViewModel
-import com.example.medex.presentation.screens.LoginScreen
-import com.example.medex.presentation.screens.SignupScreen
-import com.example.medex.presentation.screens.SplashScreen
-import com.example.medex.presentation.screens.UserDashboardScreen
+import com.example.medex.presentation.views.LoginScreen
+import com.example.medex.presentation.views.SignupScreen
+import com.example.medex.presentation.views.SplashScreen
+import com.example.medex.presentation.views.UserDashboardScreen
 
 
 object Routes {
@@ -85,7 +85,7 @@ fun MedexApp(medexViewModel: MedexViewModel = viewModel()) {
             )
         }
         composable(Routes.CHECKOUT) {
-            com.example.medex.presentation.screens.CheckoutScreen(navController = navController, medexViewModel = medexViewModel)
+            com.example.medex.presentation.views.CheckoutScreen(navController = navController, medexViewModel = medexViewModel)
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.medex.presentation.screens
+package com.example.medex.presentation.views
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

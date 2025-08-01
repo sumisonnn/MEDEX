@@ -1,4 +1,4 @@
-package com.example.medex.presentation.screens // Updated package
+package com.example.medex.presentation.views // Updated package
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

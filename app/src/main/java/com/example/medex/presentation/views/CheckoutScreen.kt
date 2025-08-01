@@ -1,4 +1,4 @@
-package com.example.medex.presentation.screens
+package com.example.medex.presentation.views
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

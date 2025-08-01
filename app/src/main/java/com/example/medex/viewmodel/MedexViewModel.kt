@@ -11,8 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.google.firebase.database.*
 
-class MedexViewModel : ViewModel() {
-
+class MedexViewModel(
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+) : ViewModel() {
 
     val medicines = mutableStateListOf<Medicine>()
     val sales = mutableStateListOf<Sale>()
@@ -29,11 +31,8 @@ class MedexViewModel : ViewModel() {
         cart.clear()
     }
 
-
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val db: FirebaseDatabase = FirebaseDatabase.getInstance()
-    private val medicinesRef: DatabaseReference = db.getReference("medicines")
-    private val salesRef: DatabaseReference = db.getReference("sales")
+    private val medicinesRef: DatabaseReference = database.getReference("medicines")
+    private val salesRef: DatabaseReference = database.getReference("sales")
 
     var currentUsername by mutableStateOf<String?>(null)
         private set
@@ -120,7 +119,6 @@ class MedexViewModel : ViewModel() {
         return sales.filter { it.medicineId == medicineId }
     }
 
-
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
         isLoading = true
         auth.signInWithEmailAndPassword(email, password)
@@ -132,7 +130,7 @@ class MedexViewModel : ViewModel() {
                     // Fetch user role from database
                     val uid = auth.currentUser?.uid
                     if (uid != null) {
-                        db.getReference("users").child(uid).child("role").get().addOnSuccessListener { snap ->
+                        database.getReference("users").child(uid).child("role").get().addOnSuccessListener { snap ->
                             userRole = snap.getValue(String::class.java)
                             onResult(true)
                         }.addOnFailureListener {
@@ -161,7 +159,7 @@ class MedexViewModel : ViewModel() {
                     // Store user role in database (default to 'user')
                     val uid = auth.currentUser?.uid
                     if (uid != null) {
-                        db.getReference("users").child(uid).child("role").setValue("user")
+                        database.getReference("users").child(uid).child("role").setValue("user")
                         userRole = "user"
                     }
                     onResult(true)
@@ -183,7 +181,7 @@ class MedexViewModel : ViewModel() {
 
     fun loadUserProfile() {
         val uid = auth.currentUser?.uid ?: return
-        db.getReference("users").child(uid).child("profile").get().addOnSuccessListener { snap ->
+        database.getReference("users").child(uid).child("profile").get().addOnSuccessListener { snap ->
             profileName = snap.child("name").getValue(String::class.java) ?: ""
             profileEmail = snap.child("email").getValue(String::class.java) ?: ""
             profilePhone = snap.child("phone").getValue(String::class.java) ?: ""
@@ -197,7 +195,7 @@ class MedexViewModel : ViewModel() {
             "email" to email,
             "phone" to phone
         )
-        db.getReference("users").child(uid).child("profile").setValue(profileMap)
+        database.getReference("users").child(uid).child("profile").setValue(profileMap)
             .addOnSuccessListener {
                 profileName = name
                 profileEmail = email
